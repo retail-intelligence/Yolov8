@@ -63,27 +63,27 @@ class DetectionPredictor(BasePredictor):
         det = results[idx].boxes  # TODO: make boxes inherit from tensors
         
         # Saves time in .txt file containing bbox, confidences and classes
-        save_bbox_conf_cls = True ##################################################################################################################
-        save_dir = './data/detections/' ############################################################################################################
-        if not os.path.isdir(save_dir): ############################################################################################################
-            os.mkdir(save_dir) #####################################################################################################################
-        info_path = f'{save_dir}frame_{str(frame).zfill(6)}'
-        if save_bbox_conf_cls:
-            with open(f'{info_path}','w') as f:
-                f.write(f"{self.time}\n")
+        # save_bbox_conf_cls = True #####################
+        # save_dir = './data/detections/' ###############
+        # if not os.path.isdir(save_dir):
+        #     os.mkdir(save_dir)
+        # info_path = f'{save_dir}frame_{str(frame).zfill(6)}'
+        # if save_bbox_conf_cls:
+        #     with open(f'{info_path}','w') as f:
+        #         f.write(f"{self.time}\n")
                 
-        det_list = []
-        for j in det:
-            det_string = ''
-            for value in range(j.boxes.shape[1]):
-                det_string += str(j.boxes[0][value].item())+' '
-            det_list.append(det_string)
+        # det_list = []
+        # for j in det:
+        #     det_string = ''
+        #     for value in range(j.boxes.shape[1]):
+        #         det_string += str(j.boxes[0][value].item())+' '
+        #     det_list.append(det_string)
 
-            if save_bbox_conf_cls:  # Write bbox, confidences and classes to file
-                with open(f'{info_path}','a') as f:
-                    for value in range(j.boxes.shape[1]):
-                        f.write(str(j.boxes[0][value].item())+' ')
-                    f.write("\n")
+        #     if save_bbox_conf_cls:  # Write bbox, confidences and classes to file
+        #         with open(f'{info_path}','a') as f:
+        #             for value in range(j.boxes.shape[1]):
+        #                 f.write(str(j.boxes[0][value].item())+' ')
+        #             f.write("\n")
         
         if len(det) == 0:
             return f'{log_string}(no detections), '
