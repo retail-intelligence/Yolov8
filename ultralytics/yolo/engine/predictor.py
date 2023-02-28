@@ -176,6 +176,8 @@ class BasePredictor:
                 self.results = self.postprocess(preds, im, im0s)
             self.run_callbacks('on_predict_postprocess_end')
 
+            self.results_for_bev = []
+
             # visualize, save, write results
             n = len(im)
             for i in range(n):
@@ -186,6 +188,14 @@ class BasePredictor:
                 p, im0 = (path[i], im0s[i].copy()) if self.source_type.webcam or self.source_type.from_img \
                     else (path, im0s.copy())
                 p = Path(p)
+                
+                det_list = []
+                for j in self.results[i].boxes:
+                    det_string = ''
+                    for value in range(j.boxes.shape[1]):
+                        det_string += str(j.boxes[0][value].item())+' '
+                    det_list.append(det_string)
+                self.results_for_bev.append(det_list)
 
                 if self.args.verbose or self.args.save or self.args.save_txt or self.args.show:
                     s += self.write_results(i, self.results, (p, im, im0))
