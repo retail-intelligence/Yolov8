@@ -1,6 +1,8 @@
 # Ultralytics YOLO 🚀, GPL-3.0 license
 
 import torch
+import os
+from datetime import datetime
 
 from ultralytics.yolo.engine.predictor import BasePredictor
 from ultralytics.yolo.engine.results import Results
@@ -28,6 +30,10 @@ class DetectionPredictor(BasePredictor):
                                         classes=self.args.classes)
 
         results = []
+
+        date = datetime.now() # for saving time of detection
+        self.time = f"{date.strftime('%Y%m%d%H%M%S%f')[:-3]}"
+
         for i, pred in enumerate(preds):
             orig_img = orig_img[i] if isinstance(orig_img, list) else orig_img
             shape = orig_img.shape
@@ -55,6 +61,30 @@ class DetectionPredictor(BasePredictor):
         self.annotator = self.get_annotator(im0)
 
         det = results[idx].boxes  # TODO: make boxes inherit from tensors
+        
+        # Saves time in .txt file containing bbox, confidences and classes
+        save_bbox_conf_cls = True ##################################################################################################################
+        save_dir = './data/detections/' ############################################################################################################
+        if not os.path.isdir(save_dir): ############################################################################################################
+            os.mkdir(save_dir) #####################################################################################################################
+        info_path = f'{save_dir}frame_{str(frame).zfill(6)}'
+        if save_bbox_conf_cls:
+            with open(f'{info_path}','w') as f:
+                f.write(f"{self.time}\n")
+                
+        det_list = []
+        for j in det:
+            det_string = ''
+            for value in range(j.boxes.shape[1]):
+                det_string += str(j.boxes[0][value].item())+' '
+            det_list.append(det_string)
+
+            if save_bbox_conf_cls:  # Write bbox, confidences and classes to file
+                with open(f'{info_path}','a') as f:
+                    for value in range(j.boxes.shape[1]):
+                        f.write(str(j.boxes[0][value].item())+' ')
+                    f.write("\n")
+        
         if len(det) == 0:
             return f'{log_string}(no detections), '
         for c in det.cls.unique():
